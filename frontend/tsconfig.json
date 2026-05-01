@@ -9,5 +9,6 @@
     "skipLibCheck": true,
     "types": ["vite/client"]
   },
-  "include": ["frontend/src"]
+  "include": ["frontend/src"],
+  "include": ["src"]
 }
