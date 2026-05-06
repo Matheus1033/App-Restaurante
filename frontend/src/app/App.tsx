@@ -1,372 +1,477 @@
-import { useEffect, useMemo, useState } from "react";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import { useMemo, useState, useEffect } from "react";
+import styled, { createGlobalStyle } from "styled-components";
+import { useCart } from "../features/cart/cartContext";
+import type { MenuItem } from "../features/cart/cartTypes";
+import { formatCurrency } from "../features/cart/cartUtils";
 
-type AuthMode = "login" | "signup";
-type Screen = "auth" | "home" | "cart";
+type NavLink = "home" | "menu" | "about" | "contact";
+type MenuCategory = "Burgers" | "Drinks" | "Desserts";
 
-type Dish = {
+type FeaturedDish = {
   name: string;
   description: string;
-  price: string;
   image: string;
 };
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+type Review = {
+  name: string;
+  comment: string;
+  stars: number;
+};
 
-const dishes: Dish[] = [
+const navItems: { label: string; href: `#${NavLink}` }[] = [
+  { label: "Home", href: "#home" },
+  { label: "Menu", href: "#menu" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
+
+const featuredDishes: FeaturedDish[] = [
   {
-    name: "Risoto de Camarão",
-    description: "Arroz arbóreo cremoso com camarão ao alho e limão-siciliano.",
-    price: "R$ 49,90",
+    name: "Truffle Wagyu Burger",
+    description:
+      "Premium wagyu patty, truffle aioli, aged cheddar, brioche bun.",
     image:
-      "https://images.unsplash.com/photo-1563379091339-03246963d29b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Filé ao Molho Madeira",
-    description:
-      "Filé mignon grelhado com batatas rústicas e legumes salteados.",
-    price: "R$ 57,90",
+    name: "Grilled Atlantic Salmon",
+    description: "Citrus glaze, herbed rice, roasted seasonal vegetables.",
     image:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Salmão Grelhado",
-    description:
-      "Salmão com crosta de ervas, arroz de amêndoas e salada fresca.",
-    price: "R$ 54,90",
+    name: "Molten Chocolate Cake",
+    description: "Warm dark chocolate center with vanilla bean cream.",
     image:
-      "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    name: "Crispy Chicken Sliders",
+    description: "Buttermilk chicken, pickles, house spicy mayo.",
+    image:
+      "https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    name: "Signature Lemonade",
+    description: "Fresh squeezed lemon, mint infusion, lightly sparkling.",
+    image:
+      "https://images.unsplash.com/photo-1523371054106-bbf80586c38c?auto=format&fit=crop&w=1400&q=80",
+  },
+  {
+    name: "Loaded Fries",
+    description: "Crispy fries with parmesan, herbs, and garlic drizzle.",
+    image:
+      "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1400&q=80",
   },
 ];
 
-const darkTheme = {
-  colors: {
-    background: "#121212",
-    surface: "#1e1e1e",
-    surfaceAlt: "#2b2b2b",
-    text: "#f5f5f5",
-    textMuted: "#cccccc",
-    accent: "#d97706",
+const menuItems: MenuItem[] = [
+  {
+    name: "Classic Smash",
+    description: "Double patty, cheddar, house sauce",
+    price: "$14",
+    category: "Burgers",
   },
-};
+  {
+    name: "Mushroom Melt",
+    description: "Swiss cheese, mushrooms, caramelized onion",
+    price: "$16",
+    category: "Burgers",
+  },
+  {
+    name: "Sparkling Berry",
+    description: "Fresh berries, citrus, sparkling water",
+    price: "$6",
+    category: "Drinks",
+  },
+  {
+    name: "Iced Mocha",
+    description: "Single-origin coffee with dark chocolate",
+    price: "$5",
+    category: "Drinks",
+  },
+  {
+    name: "Cheesecake",
+    description: "Vanilla bean, berry compote",
+    price: "$8",
+    category: "Desserts",
+  },
+  {
+    name: "Tiramisu Cup",
+    description: "Espresso-soaked layers and mascarpone",
+    price: "$9",
+    category: "Desserts",
+  },
+];
 
-const lightTheme = {
-  colors: {
-    background: "#f7f5f2",
-    surface: "#ffffff",
-    surfaceAlt: "#ece7df",
-    text: "#1f2937",
-    textMuted: "#6b7280",
-    accent: "#c2410c",
+const reviews: Review[] = [
+  {
+    name: "Amanda P.",
+    stars: 5,
+    comment:
+      "Reservation was easy, service was quick, and the food was incredible.",
   },
-};
+  {
+    name: "Jordan R.",
+    stars: 5,
+    comment:
+      "Best burger in town. Ordered online and pickup took less than 15 minutes.",
+  },
+  {
+    name: "Chris L.",
+    stars: 4,
+    comment: "Great ambience and excellent desserts. Perfect for date night.",
+  },
+];
 
 const GlobalStyle = createGlobalStyle`
 * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
 
   body {
     margin: 0;
-    font-family: Inter, system-ui, sans-serif;
-    background: ${({ theme }) => theme.colors.background};
-    color: ${({ theme }) => theme.colors.text};
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: #f8fafc;
+    background: #0f172a;
+  }
+  a { 
+    color: inherit;
+    text-decoration: none; 
+    cursor: pointer;
+  }
+  button {
+    cursor: pointer;
   }
 `;
 
-const Page = styled.main`
-  min-height: 100vh;
-  padding: 24px;
+const Page = styled.main``;
+const Section = styled.section`
+  padding: 72px 20px;
+  @media (min-width: 768px) {
+    padding: 96px 48px;
+  }
 `;
 
-const AuthContainer = styled.section`
-  min-height: calc(100vh - 48px);
-  display: grid;
-  place-items: center;
+const Container = styled.div`
+  width: min(1120px, 100%);
+  margin: 0 auto;
 `;
 
-const Card = styled.section`
-  width: min(420px, 100%);
-  padding: 24px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.colors.surface};
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+const Navbar = styled.header<{ $solid: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: ${({ $solid }) =>
+    $solid ? "rgba(2, 6, 23, 0.97)" : "transparent"};
+  border-bottom: ${({ $solid }) =>
+    $solid ? "1px solid rgba(255,255,255,0.1)" : "none"};
+  transition: all 0.2s ease;
 `;
 
-const Field = styled.input`
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-`;
-
-const Button = styled.button`
-  border: none;
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-`;
-
-const Toggle = styled.button`
-  border: none;
-  margin-top: 12px;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.accent};
-  cursor: pointer;
-`;
-
-const Header = styled.header`
+const NavRow = styled(Container)`
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  padding: 12px 0;
 `;
 
-const Logo = styled.h1`
-  margin: 0;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const IconButton = styled.button`
-  border: none;
-  border-radius: 999px;
-  padding: 10px 12px;
-  cursor: pointer;
-  background: ${({ theme }) => theme.colors.surfaceAlt};
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const Carousel = styled.section`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(260px, 1fr));
-  gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-`;
-
-const Slide = styled.article<{ $active: boolean }>`
-  min-height: 220px;
-  border-radius: 14px;
+const Hero = styled.section`
+  min-height: 100vh;
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
-    url(${({ $active }) => ($active ? "" : "")});
+    linear-gradient(rgba(2, 6, 23, 0.65), rgba(2, 6, 23, 0.75)),
+    url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=2000&q=80");
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: end;
-  padding: 16px;
-  color: #fff;
-  transform: ${({ $active }) => ($active ? "scale(1.01)" : "scale(0.99)")};
-  transition: transform 0.2s ease;
+  align-items: center;
 `;
 
-const MenuGrid = styled.section`
-  margin-top: 24px;
+const Grid = styled.div`
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-`;
-
-const DishCard = styled.article`
-  background: ${({ theme }) => theme.colors.surface};
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
-`;
-
-const DishImage = styled.img`
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-`;
-
-const DishContent = styled.div`
-  padding: 12px;
-`;
-
-const SmallText = styled.p`
-  color: ${({ theme }) => theme.colors.textMuted};
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
 `;
 
 export const App = () => {
-  const [mode, setMode] = useState<AuthMode>("login");
-  const [screen, setScreen] = useState<Screen>("auth");
-  const [isDark, setIsDark] = useState(true);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  const title = useMemo(
-    () => (mode === "login" ? "Entrar na conta" : "Criar conta"),
-    [mode],
-  );
+  const {
+    addToCart,
+    decrement,
+    increment,
+    removeFromCart,
+    items,
+    subtotal,
+    total,
+    totalQuantity,
+    isLoading,
+    clearCart,
+  } = useCart();
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isSolidNav, setSolidNav] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<MenuCategory>("Burgers");
 
   useEffect(() => {
-    if (screen !== "home") return;
-    const interval = setInterval(() => {
-      setActiveSlide((current) => (current + 1) % dishes.length);
-    }, 2800);
+    const onScroll = () => setSolidNav(window.scrollY > 32);
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [screen]);
-
-  const clearForm = () => {
-    setName("");
-    setPhone("");
-    setEmail("");
-    setPassword("");
-  };
-
-  const submit = async () => {
-    const endpoint = mode === "login" ? "/auth/login" : "/auth/sign-up";
-    const payload =
-      mode === "login" ? { email, password } : { name, phone, email, password };
-
-    try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = (await response.json()) as { message?: string };
-
-      if (!response.ok) {
-        setMessage(data.message ?? "Não foi possível concluir a solicitação.");
-        return;
-      }
-
-      setMessage(data.message ?? "Sucesso");
-      clearForm();
-      setScreen("home");
-      if (mode === "signup") setMode("login");
-    } catch {
-      setMessage("Servidor indisponível no momento.");
-    }
-  };
+  const filteredMenu = useMemo(
+    () => menuItems.filter((item) => item.category === activeCategory),
+    [activeCategory],
+  );
 
   return (
-    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+    <>
       <GlobalStyle />
       <Page>
-        {screen === "auth" && (
-          <AuthContainer>
-            <Card>
-              <h1>{title}</h1>
-              {mode === "signup" && (
-                <>
-                  <Field
-                    placeholder="Nome"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                  <Field
-                    placeholder="Telefone"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                  />
-                </>
-              )}
-              <Field
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-              <Field
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              <Button onClick={submit}>
-                {mode === "login" ? "Entrar" : "Cadastrar"}
-              </Button>
-              <Toggle
-                onClick={() => setMode(mode === "login" ? "signup" : "login")}
+        <Navbar $solid={isSolidNav}>
+          <NavRow>
+            <header>
+              <strong>Santinho & Cia</strong>
+            </header>
+            <nav style={{ display: isMenuOpen ? "block" : "none" }}>
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  style={{ margin: "0 10px" }}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <a href="https://wa.me/5521996754183">📞 (21) 99675-4183</a>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-label="Abrir menu"
               >
-                {mode === "login"
-                  ? "Não tem conta? Cadastre-se"
-                  : "Já tem conta? Fazer login"}
-              </Toggle>
-              {message && <SmallText>{message}</SmallText>}
-            </Card>
-          </AuthContainer>
-        )}
+                ☰
+              </button>
+              <button>🛒 {totalQuantity}</button>
+            </div>
+          </NavRow>
+        </Navbar>
 
-        {screen === "home" && (
-          <>
-            <Header>
-              <Logo>🍽️ Sabor da Casa</Logo>
-              <HeaderActions>
-                <IconButton onClick={() => setIsDark((current) => !current)}>
-                  {isDark ? "☀️" : "🌙"}
-                </IconButton>
-                <IconButton onClick={() => setScreen("cart")}>🛒</IconButton>
-              </HeaderActions>
-            </Header>
+        <Hero id="home">
+          <Container>
+            <h1
+              style={{ fontSize: "clamp(2rem, 8vw, 4.5rem)", marginBottom: 6 }}
+            >
+              Santinho & Cia
+            </h1>
+            <p style={{ maxWidth: 580, fontSize: "1.1rem", color: "#dbeafe" }}>
+              Comida reconfortante preparada por chefs, entregue rapidamente ou
+              servida fresca no nosso salão no centro.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: 14,
+                flexWrap: "wrap",
+                marginTop: 24,
+                transition: "ease-in-out",
+              }}
+            >
+              <a
+                href="#menu"
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                style={{
+                  background: hover ? "transparent" : "#f97316",
+                  border: hover ? "1px solid #fff" : "1px solid #f97316",
+                  padding: "12px 18px",
+                  borderRadius: 999,
+                }}
+              >
+                Peça Agora
+              </a>
+              <a
+                href="#contact"
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                style={{
+                  border: hover ? "1px solid #f97316" : "1px solid #fff",
+                  padding: "12px 18px",
+                  borderRadius: 999,
+                  backgroundColor: hover ? "#f97316" : "transparent",
+                  color: hover ? "#000" : "#fff",
+                }}
+              >
+                Reservar Mesa
+              </a>
+            </div>
+          </Container>
+        </Hero>
 
-            <h2>Pratos do dia</h2>
-            <Carousel>
-              {dishes.map((dish, index) => (
-                <Slide
+        <Section>
+          <Container>
+            <h2>Destaques</h2>
+            <Grid>
+              {featuredDishes.map((dish) => (
+                <article
                   key={dish.name}
-                  $active={activeSlide === index}
                   style={{
-                    backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${dish.image})`,
+                    background: "#1e293b",
+                    borderRadius: 16,
+                    overflow: "hidden",
+                    transition: "transform .2s",
+                    boxShadow: "0 10px 30px rgba(0,0,0,.25)",
                   }}
                 >
-                  <div>
+                  <img
+                    src={dish.image}
+                    alt={dish.name}
+                    loading="lazy"
+                    style={{ width: "100%", height: 170, objectFit: "cover" }}
+                  />
+                  <div style={{ padding: 16 }}>
                     <h3>{dish.name}</h3>
-                    <p>{dish.price}</p>
+                    <p style={{ color: "#cbd5e1" }}>{dish.description}</p>
                   </div>
-                </Slide>
+                </article>
               ))}
-            </Carousel>
+            </Grid>
+          </Container>
+        </Section>
 
-            <h2>Cardápio</h2>
-            <MenuGrid>
-              {dishes.map((dish) => (
-                <DishCard key={dish.name}>
-                  <DishImage src={dish.image} alt={dish.name} />
-                  <DishContent>
-                    <h3>{dish.name}</h3>
-                    <SmallText>{dish.description}</SmallText>
-                    <p>{dish.price}</p>
-                    <Button onClick={() => setScreen("cart")}>
-                      Ir para o carrinho
-                    </Button>
-                  </DishContent>
-                </DishCard>
+        <Section id="menu">
+          <Container>
+            <h2>Menu Preview</h2>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                margin: "12px 0 20px",
+              }}
+            >
+              {(["Burgers", "Drinks", "Desserts"] as MenuCategory[]).map(
+                (category) => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    style={{
+                      padding: "10px 14px",
+                      borderRadius: 999,
+                      border: "none",
+                      background:
+                        activeCategory === category ? "#f97316" : "#334155",
+                      color: "white",
+                    }}
+                  >
+                    {category}
+                  </button>
+                ),
+              )}
+            </div>
+            <Grid>
+              {filteredMenu.map((item) => (
+                <article
+                  key={item.name}
+                  style={{
+                    background: "#1e293b",
+                    padding: 16,
+                    borderRadius: 12,
+                  }}
+                >
+                  <h3>
+                    {item.name}{" "}
+                    <span style={{ color: "#fb923c" }}>{item.price}</span>
+                  </h3>
+                  <p style={{ color: "#cbd5e1" }}>{item.description}</p>
+                </article>
               ))}
-            </MenuGrid>
-          </>
-        )}
+            </Grid>
+            <p>
+              <a href="#" style={{ color: "#fb923c", fontWeight: 700 }}>
+                View Full Menu →
+              </a>
+            </p>
+          </Container>
+        </Section>
 
-        {screen === "cart" && (
-          <Card>
-            <h2>Seu carrinho</h2>
-            <SmallText>
-              Seu prato foi adicionado com sucesso. Finalize seu pedido quando
-              quiser.
-            </SmallText>
-            <Button onClick={() => setScreen("home")}>
-              Voltar para o início
-            </Button>
-          </Card>
-        )}
+        <Section id="about">
+          <Container>
+            <h2>About Us</h2>
+            <p>
+              Founded in 2018, Urban Fork blends neighborhood hospitality with
+              elevated comfort food. Our team sources fresh local produce and
+              prepares every dish to order.
+            </p>
+          </Container>
+        </Section>
+        <Section>
+          <Container>
+            <h2>What Guests Say</h2>
+            <Grid>
+              {reviews.map((r) => (
+                <article
+                  key={r.name}
+                  style={{
+                    background: "#1e293b",
+                    padding: 16,
+                    borderRadius: 12,
+                  }}
+                >
+                  <p>{"★".repeat(r.stars)}</p>
+                  <p>{r.comment}</p>
+                  <small>{r.name}</small>
+                </article>
+              ))}
+            </Grid>
+          </Container>
+        </Section>
+        <Section id="contact">
+          <Container>
+            <h2>Location & Contact</h2>
+            <p>125 Market Street, New York, NY</p>
+            <p>Mon–Thu: 11:00 AM – 10:00 PM | Fri–Sun: 11:00 AM – 11:30 PM</p>
+            <p>
+              <a href="tel:+12125551234">(212) 555-1234</a> •{" "}
+              <a href="https://wa.me/12125551234">WhatsApp Orders</a>
+            </p>
+            <iframe
+              title="Google map"
+              src="https://www.google.com/maps?q=Times+Square+New+York&output=embed"
+              width="100%"
+              height="280"
+              loading="lazy"
+              style={{ border: 0, borderRadius: 12 }}
+            />
+          </Container>
+        </Section>
+        <footer
+          style={{
+            padding: "24px 20px",
+            borderTop: "1px solid rgba(255,255,255,.15)",
+          }}
+        >
+          <Container>
+            <p>© {new Date().getFullYear()} Urban Fork. All rights reserved.</p>
+          </Container>
+        </footer>
+        <a
+          href="#menu"
+          style={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            background: "#ea580c",
+            padding: "12px 16px",
+            borderRadius: 999,
+            fontWeight: 700,
+            boxShadow: "0 10px 24px rgba(0,0,0,.3)",
+          }}
+        >
+          Order Now
+        </a>
       </Page>
-    </ThemeProvider>
+    </>
   );
 };

@@ -24,3 +24,12 @@ cp .env.example .env
 npm run prisma:generate
 npm run dev
 ```
+
+## Assets estáticos
+
+Use a pasta `frontend/public/assets` para armazenar arquivos estáticos do app:
+
+- `images/`
+- `fonts/`
+- `videos/`
+- `misc/`

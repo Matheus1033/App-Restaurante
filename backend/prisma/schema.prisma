@@ -10,7 +10,8 @@ datasource db {
 model MenuItem {
     id          String   @id @default(auto()) @map("_id") @db.ObjectId
     name        String
-    description String?
+    description String
+    image       String
     price       Float
     createdAt   DateTime @default(now())
 }
