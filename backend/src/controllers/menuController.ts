@@ -27,22 +27,30 @@ export const getMenuItemByIdController = async (
 };
 
 export const createMenuItemController = async (req: Request, res: Response) => {
-  const { name, description, price } = req.body as {
+  const { name, description, image, price } = req.body as {
     name?: string;
     description?: string;
+    image?: string;
     price?: number;
   };
 
-  if (!name || typeof price !== "number") {
-    return res
-      .status(400)
-      .json({ message: "Informe nome e preço numérico do item." });
+  if (
+    !name?.trim() ||
+    !description?.trim() ||
+    !image?.trim() ||
+    typeof price !== "number"
+  ) {
+    return res.status(400).json({
+      message:
+        "Informe nome, descrição, URL da imagem e preço numérico do item.",
+    });
   }
 
   const createdItem = await prisma.menuItem.create({
     data: {
       name: name.trim(),
-      description: description?.trim(),
+      description: description.trim(),
+      image: image.trim(),
       price,
     },
   });
@@ -55,9 +63,10 @@ export const createMenuItemController = async (req: Request, res: Response) => {
 
 export const updateMenuItemController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, description, price } = req.body as {
+  const { name, description, image, price } = req.body as {
     name?: string;
     description?: string;
+    image?: string;
     price?: number;
   };
 
@@ -73,6 +82,14 @@ export const updateMenuItemController = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Nome inválido." });
   }
 
+  if (description !== undefined && !description.trim()) {
+    return res.status(400).json({ message: "Descrição inválida." });
+  }
+
+  if (image !== undefined && !image.trim()) {
+    return res.status(400).json({ message: "Imagem inválida." });
+  }
+
   if (price !== undefined && typeof price !== "number") {
     return res.status(400).json({ message: "Preço inválido." });
   }
@@ -82,6 +99,7 @@ export const updateMenuItemController = async (req: Request, res: Response) => {
     data: {
       name: name?.trim(),
       description: description?.trim(),
+      image: image?.trim(),
       price,
     },
   });
