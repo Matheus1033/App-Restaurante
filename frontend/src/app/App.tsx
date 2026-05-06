@@ -19,7 +19,7 @@ type Review = {
   stars: number;
 };
 
-const logoName = "Delícias da Drica";
+const logoName = "Delícias da Dri";
 const contactNumber = "(21) 996754183";
 
 const navItems: { label: string; href: `#${NavLink}` }[] = [
@@ -518,7 +518,7 @@ export const App = () => {
                         backgroundColor: "red",
                         color: "#000",
                         fontWeight: "700",
-                        fontSize: "1.5rem",
+                        fontSize: "1.1rem",
                         fontFamily: "sans-serif",
                         border: "none",
                         borderRadius: 8,
