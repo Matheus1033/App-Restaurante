@@ -74,7 +74,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       decrement: (id) => {
         setItems((current) =>
           current.map((item) =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item,
+            item.id === id
+              ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+              : item,
           ),
         );
       },
@@ -90,7 +92,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error("useCart must be used within CartProvider");
+    throw new Error("useCart deve ser usado com CartProvider");
   }
   return context;
 };

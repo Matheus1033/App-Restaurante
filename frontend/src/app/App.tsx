@@ -22,44 +22,43 @@ type Review = {
 const navItems: { label: string; href: `#${NavLink}` }[] = [
   { label: "Home", href: "#home" },
   { label: "Menu", href: "#menu" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Sobre", href: "#about" },
+  { label: "Contato", href: "#contact" },
 ];
 
 const featuredDishes: FeaturedDish[] = [
   {
-    name: "Truffle Wagyu Burger",
-    description:
-      "Premium wagyu patty, truffle aioli, aged cheddar, brioche bun.",
+    name: "X-Burger",
+    description: "Uma Gostosura de Hamburguer com pão e carne :)",
     image:
       "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Grilled Atlantic Salmon",
+    name: "Salmão Grelhado Atlântico",
     description: "Citrus glaze, herbed rice, roasted seasonal vegetables.",
     image:
       "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Molten Chocolate Cake",
+    name: "Bolo de Molten Chocolate",
     description: "Warm dark chocolate center with vanilla bean cream.",
     image:
       "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Crispy Chicken Sliders",
+    name: "Chicken-Burger",
     description: "Buttermilk chicken, pickles, house spicy mayo.",
     image:
       "https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Signature Lemonade",
+    name: "Limonada",
     description: "Fresh squeezed lemon, mint infusion, lightly sparkling.",
     image:
       "https://images.unsplash.com/photo-1523371054106-bbf80586c38c?auto=format&fit=crop&w=1400&q=80",
   },
   {
-    name: "Loaded Fries",
+    name: "Batata Rústica",
     description: "Crispy fries with parmesan, herbs, and garlic drizzle.",
     image:
       "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=1400&q=80",
@@ -68,40 +67,58 @@ const featuredDishes: FeaturedDish[] = [
 
 const menuItems: MenuItem[] = [
   {
+    id: "1",
     name: "Classic Smash",
     description: "Double patty, cheddar, house sauce",
-    price: "$14",
+    price: 14,
     category: "Burgers",
+    image:
+      "https://i.pinimg.com/1200x/c9/c5/01/c9c5013a47c78dde12d22a8659cdb945.jpg",
   },
   {
+    id: "2",
     name: "Mushroom Melt",
     description: "Swiss cheese, mushrooms, caramelized onion",
-    price: "$16",
+    price: 16,
     category: "Burgers",
+    image:
+      "https://i.pinimg.com/1200x/a1/98/b6/a198b6496b29520230700caf94f44d25.jpg",
   },
   {
+    id: "3",
     name: "Sparkling Berry",
     description: "Fresh berries, citrus, sparkling water",
-    price: "$6",
+    price: 6,
     category: "Drinks",
+    image:
+      "https://i.pinimg.com/1200x/cb/07/46/cb0746b50a01acf0d2dd94789a464c3b.jpg",
   },
   {
+    id: "4",
     name: "Iced Mocha",
     description: "Single-origin coffee with dark chocolate",
-    price: "$5",
+    price: 5,
     category: "Drinks",
+    image:
+      "https://i.pinimg.com/1200x/4d/e0/68/4de068124212961d6481e6c631774053.jpg",
   },
   {
+    id: "5",
     name: "Cheesecake",
     description: "Vanilla bean, berry compote",
-    price: "$8",
+    price: 8,
     category: "Desserts",
+    image:
+      "https://i.pinimg.com/1200x/de/a0/1a/dea01a87b4e0389b06ea43a19e6af30c.jpg",
   },
   {
+    id: "6",
     name: "Tiramisu Cup",
     description: "Espresso-soaked layers and mascarpone",
-    price: "$9",
+    price: 9,
     category: "Desserts",
+    image:
+      "https://i.pinimg.com/1200x/6f/3b/1a/6f3b1adb610696d318e33dd76bb4312f.jpg",
   },
 ];
 
@@ -195,6 +212,70 @@ const Grid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
 `;
 
+const CartBtn = styled.button`
+  position: relative;
+  border: none;
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+`;
+const Badge = styled.span`
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #c2410c;
+  color: #fff;
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+`;
+
+const Card = styled.article`
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+`;
+const Img = styled.img`
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+`;
+const Content = styled.div`
+  padding: 12px;
+`;
+const Button = styled.button`
+  border: none;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  background: #c2410c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+`;
+const Overlay = styled.div<{ $open: boolean }>`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: ${({ $open }) => ($open ? "block" : "none")};
+`;
+const Sidebar = styled.aside<{ $open: boolean }>`
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(420px, 100%);
+  background: rgba(2, 6, 23, 0.97);
+  padding: 16px;
+  transform: translateX(${({ $open }) => ($open ? "0" : "100%")});
+  transition: transform 0.25s ease;
+  overflow: auto;
+`;
+
 export const App = () => {
   const {
     addToCart,
@@ -208,6 +289,16 @@ export const App = () => {
     isLoading,
     clearCart,
   } = useCart();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const whatsappUrl = useMemo(() => {
+    const lines = items.map(
+      (item) =>
+        `• ${item.name} x${item.quantity} = ${formatCurrency(item.quantity * item.price)}`,
+    );
+    const text = `Olá! Quero fazer este pedido:%0A${lines.join("%0A")}%0A%0ATotal: ${formatCurrency(total)}`;
+    return `https://wa.me/?text=${text}`;
+  }, [items, total]);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSolidNav, setSolidNav] = useState(false);
   const [hover, setHover] = useState(false);
@@ -253,7 +344,84 @@ export const App = () => {
               >
                 ☰
               </button>
-              <button>🛒 {totalQuantity}</button>
+              <CartBtn onClick={() => setIsOpen(true)}>
+                🛒 Carrinho{totalQuantity > 0 && <Badge>{totalQuantity}</Badge>}
+              </CartBtn>
+              <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
+              <Sidebar $open={isOpen}>
+                <h2>Seu carrinho</h2>
+                {isLoading && <p>Carregando carrinho...</p>}
+                {!isLoading && items.length === 0 && (
+                  <p>Seu carrinho está vazio.</p>
+                )}
+                {items.map((item) => (
+                  <Card key={item.id}>
+                    <Content>
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        style={{
+                          width: "100%",
+                          height: 100,
+                          objectFit: "cover",
+                          borderRadius: 8,
+                        }}
+                      />
+                      <h4>{item.name}</h4>
+                      <p>{formatCurrency(item.price)} cada</p>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          onClick={() => decrement(item.id)}
+                          disabled={item.quantity === 1}
+                        >
+                          -
+                        </button>
+                        <strong>{item.quantity}</strong>
+                        <button onClick={() => increment(item.id)}>+</button>
+                        <button onClick={() => removeFromCart(item.id)}>
+                          Remover
+                        </button>
+                      </div>
+                      <small>
+                        Subtotal: {formatCurrency(item.quantity * item.price)}
+                      </small>
+                    </Content>
+                  </Card>
+                ))}
+                <hr />
+                <p>
+                  Subtotal: <strong>{formatCurrency(subtotal)}</strong>
+                </p>
+                <p>
+                  Total: <strong>{formatCurrency(total)}</strong>
+                </p>
+                <div style={{ padding: "20px" }}>
+                  <Button
+                    as="a"
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Send Order
+                  </Button>
+                  <button
+                    onClick={clearCart}
+                    style={{
+                      marginLeft: "20px",
+                      padding: "10px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Limpar carrinho
+                  </button>
+                </div>
+              </Sidebar>
             </div>
           </NavRow>
         </Navbar>
@@ -341,7 +509,7 @@ export const App = () => {
 
         <Section id="menu">
           <Container>
-            <h2>Menu Preview</h2>
+            <h2>Menu</h2>
             <div
               style={{
                 display: "flex",
@@ -377,19 +545,31 @@ export const App = () => {
                     background: "#1e293b",
                     padding: 16,
                     borderRadius: 12,
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <h3>
-                    {item.name}{" "}
-                    <span style={{ color: "#fb923c" }}>{item.price}</span>
-                  </h3>
-                  <p style={{ color: "#cbd5e1" }}>{item.description}</p>
+                  <div>
+                    <h3>
+                      {item.name}{" "}
+                      <span style={{ color: "#fb923c" }}>
+                        R$: {item.price}.00
+                      </span>
+                    </h3>
+                    <p style={{ color: "#cbd5e1" }}>{item.description}</p>
+                  </div>
+                  <div>
+                    <img
+                      src={item.image}
+                      style={{ width: "100px", height: "100px" }}
+                    />
+                  </div>
                 </article>
               ))}
             </Grid>
             <p>
               <a href="#" style={{ color: "#fb923c", fontWeight: 700 }}>
-                View Full Menu →
+                Olhar Todo o Menu →
               </a>
             </p>
           </Container>
@@ -397,17 +577,24 @@ export const App = () => {
 
         <Section id="about">
           <Container>
-            <h2>About Us</h2>
+            <h2>Sobre Nós</h2>
             <p>
-              Founded in 2018, Urban Fork blends neighborhood hospitality with
-              elevated comfort food. Our team sources fresh local produce and
-              prepares every dish to order.
+              Erigimo-nos enquanto núcleo familiar que, imbuído de inequívoca
+              vocação e de um inquebrantável zelo pela arte gastronômica,
+              deliberou, com ponderação e desvelo, instituir o presente
+              estabelecimento como expressão tangível de nossos mais elevados
+              anseios e predileções. Movemo-nos pelo propósito de transmutar
+              dedicação, tradição e apuro técnico em experiências sensoriais de
+              rara distinção, de modo que cada visitante, ao nos honrar com sua
+              presença, não apenas encontre satisfação, mas seja agraciado com
+              um deleite autêntico, impregnado de significado, acolhimento e
+              refinado apreço.
             </p>
           </Container>
         </Section>
         <Section>
           <Container>
-            <h2>What Guests Say</h2>
+            <h2>Comentários</h2>
             <Grid>
               {reviews.map((r) => (
                 <article
@@ -428,12 +615,26 @@ export const App = () => {
         </Section>
         <Section id="contact">
           <Container>
-            <h2>Location & Contact</h2>
+            <h2>Localização & Contato</h2>
             <p>125 Market Street, New York, NY</p>
             <p>Mon–Thu: 11:00 AM – 10:00 PM | Fri–Sun: 11:00 AM – 11:30 PM</p>
             <p>
-              <a href="tel:+12125551234">(212) 555-1234</a> •{" "}
-              <a href="https://wa.me/12125551234">WhatsApp Orders</a>
+              <a
+                href="https://wa.me/21996754183"
+                style={{ display: "flex", gap: "10px", fontSize: "1.05rem" }}
+                target="blank"
+              >
+                <img
+                  src="https://i.pinimg.com/736x/ef/55/ac/ef55acaed134cf97d2a5f9f1e4815295.jpg"
+                  alt="Whatsapp"
+                  style={{
+                    width: "50px",
+                    height: "auto",
+                    borderRadius: "999px",
+                  }}
+                />{" "}
+                <p>(21) 99675-4183</p>
+              </a>
             </p>
             <iframe
               title="Google map"
@@ -452,7 +653,10 @@ export const App = () => {
           }}
         >
           <Container>
-            <p>© {new Date().getFullYear()} Urban Fork. All rights reserved.</p>
+            <p>
+              © {new Date().getFullYear()} Santinho & Cia. Todos os Direitos
+              Reservados.
+            </p>
           </Container>
         </footer>
         <a
