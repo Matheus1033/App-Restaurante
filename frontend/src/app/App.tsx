@@ -19,6 +19,9 @@ type Review = {
   stars: number;
 };
 
+const logoName = "Delícias da Drica";
+const contactNumber = "(21) 996754183";
+
 const navItems: { label: string; href: `#${NavLink}` }[] = [
   { label: "Home", href: "#home" },
   { label: "Menu", href: "#menu" },
@@ -67,7 +70,7 @@ const featuredDishes: FeaturedDish[] = [
 
 const menuItems: MenuItem[] = [
   {
-    id: "1",
+    id: 1,
     name: "Classic Smash",
     description: "Double patty, cheddar, house sauce",
     price: 14,
@@ -76,7 +79,7 @@ const menuItems: MenuItem[] = [
       "https://i.pinimg.com/1200x/c9/c5/01/c9c5013a47c78dde12d22a8659cdb945.jpg",
   },
   {
-    id: "2",
+    id: 2,
     name: "Mushroom Melt",
     description: "Swiss cheese, mushrooms, caramelized onion",
     price: 16,
@@ -85,7 +88,7 @@ const menuItems: MenuItem[] = [
       "https://i.pinimg.com/1200x/a1/98/b6/a198b6496b29520230700caf94f44d25.jpg",
   },
   {
-    id: "3",
+    id: 3,
     name: "Sparkling Berry",
     description: "Fresh berries, citrus, sparkling water",
     price: 6,
@@ -94,7 +97,7 @@ const menuItems: MenuItem[] = [
       "https://i.pinimg.com/1200x/cb/07/46/cb0746b50a01acf0d2dd94789a464c3b.jpg",
   },
   {
-    id: "4",
+    id: 4,
     name: "Iced Mocha",
     description: "Single-origin coffee with dark chocolate",
     price: 5,
@@ -103,7 +106,7 @@ const menuItems: MenuItem[] = [
       "https://i.pinimg.com/1200x/4d/e0/68/4de068124212961d6481e6c631774053.jpg",
   },
   {
-    id: "5",
+    id: 5,
     name: "Cheesecake",
     description: "Vanilla bean, berry compote",
     price: 8,
@@ -112,7 +115,7 @@ const menuItems: MenuItem[] = [
       "https://i.pinimg.com/1200x/de/a0/1a/dea01a87b4e0389b06ea43a19e6af30c.jpg",
   },
   {
-    id: "6",
+    id: 6,
     name: "Tiramisu Cup",
     description: "Espresso-soaked layers and mascarpone",
     price: 9,
@@ -189,10 +192,71 @@ const Navbar = styled.header<{ $solid: boolean }>`
 `;
 
 const NavRow = styled(Container)`
+  width: 90%;
   min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+const HiddenCheckbox = styled.input`
+  display: none;
+`;
+
+const Label = styled.label`
+  cursor: pointer;
+  display: inline-block;
+`;
+
+const Menu = styled.div`
+  width: 30px;
+  height: 24px;
+  position: relative;
+`;
+
+const Hamburger = styled.span`
+  display: block;
+  width: 30px;
+  height: 3px;
+  background: white;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 0.3s;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    background: white;
+    transition: 0.3s;
+  }
+
+  &::before {
+    top: -8px;
+  }
+
+  &::after {
+    top: 8px;
+  }
+`;
+
+const Wrapper = styled.div`
+  ${HiddenCheckbox}:checked + ${Label} ${Hamburger} {
+    background: transparent;
+  }
+
+  ${HiddenCheckbox}:checked + ${Label} ${Hamburger}::before {
+    transform: rotate(45deg);
+    top: 0;
+  }
+
+  ${HiddenCheckbox}:checked + ${Label} ${Hamburger}::after {
+    transform: rotate(-45deg);
+    top: 0;
+  }
 `;
 
 const Hero = styled.section`
@@ -217,6 +281,7 @@ const CartBtn = styled.button`
   border: none;
   background: #ffffff;
   padding: 10px 14px;
+  margin-left: 20px;
   border-radius: 999px;
   cursor: pointer;
 `;
@@ -235,9 +300,10 @@ const Badge = styled.span`
 `;
 
 const Card = styled.article`
-  background: #ffffff;
+  background: #c2410c;
   border-radius: 12px;
   overflow: hidden;
+  margin-bottom: 15px;
 `;
 const Img = styled.img`
   width: 100%;
@@ -246,6 +312,7 @@ const Img = styled.img`
 `;
 const Content = styled.div`
   padding: 12px;
+  gap: 10px;
 `;
 const Button = styled.button`
   border: none;
@@ -320,118 +387,124 @@ export const App = () => {
     <>
       <GlobalStyle />
       <Page>
-        <Navbar $solid={isSolidNav}>
-          <NavRow>
-            <header>
-              <strong>Santinho & Cia</strong>
-            </header>
-            <nav style={{ display: isMenuOpen ? "block" : "none" }}>
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  style={{ margin: "0 10px" }}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <a href="https://wa.me/5521996754183">📞 (21) 99675-4183</a>
-              <button
-                onClick={() => setMenuOpen((v) => !v)}
-                aria-label="Abrir menu"
-              >
-                ☰
-              </button>
-              <CartBtn onClick={() => setIsOpen(true)}>
-                🛒 Carrinho{totalQuantity > 0 && <Badge>{totalQuantity}</Badge>}
-              </CartBtn>
-              <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
-              <Sidebar $open={isOpen}>
-                <h2>Seu carrinho</h2>
-                {isLoading && <p>Carregando carrinho...</p>}
-                {!isLoading && items.length === 0 && (
-                  <p>Seu carrinho está vazio.</p>
-                )}
-                {items.map((item) => (
-                  <Card key={item.id}>
-                    <Content>
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        style={{
-                          width: "100%",
-                          height: 100,
-                          objectFit: "cover",
-                          borderRadius: 8,
-                        }}
-                      />
-                      <h4>{item.name}</h4>
-                      <p>{formatCurrency(item.price)} cada</p>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 8,
-                          alignItems: "center",
-                        }}
-                      >
-                        <button
-                          onClick={() => decrement(item.id)}
-                          disabled={item.quantity === 1}
-                        >
-                          -
-                        </button>
-                        <strong>{item.quantity}</strong>
-                        <button onClick={() => increment(item.id)}>+</button>
-                        <button onClick={() => removeFromCart(item.id)}>
-                          Remover
-                        </button>
-                      </div>
-                      <small>
-                        Subtotal: {formatCurrency(item.quantity * item.price)}
-                      </small>
-                    </Content>
-                  </Card>
+        <header>
+          <Navbar $solid={isSolidNav}>
+            <NavRow>
+              <strong>{logoName}</strong>
+              <nav style={{ display: isMenuOpen ? "block" : "none" }}>
+                {navItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    style={{ margin: "0 10px" }}
+                  >
+                    {item.label}
+                  </a>
                 ))}
-                <hr />
-                <p>
-                  Subtotal: <strong>{formatCurrency(subtotal)}</strong>
-                </p>
-                <p>
-                  Total: <strong>{formatCurrency(total)}</strong>
-                </p>
-                <div style={{ padding: "20px" }}>
-                  <Button
-                    as="a"
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Send Order
-                  </Button>
-                  <button
-                    onClick={clearCart}
-                    style={{
-                      marginLeft: "20px",
-                      padding: "10px",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Limpar carrinho
-                  </button>
-                </div>
-              </Sidebar>
-            </div>
-          </NavRow>
-        </Navbar>
-
+              </nav>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Wrapper>
+                  <HiddenCheckbox
+                    type="checkbox"
+                    id="menu-hamburguer"
+                    onClick={() => setMenuOpen((v) => !v)}
+                    aria-label="Abrir menu"
+                  />
+                  <Label htmlFor="menu-hamburguer">
+                    <Menu>
+                      <Hamburger />
+                    </Menu>
+                  </Label>
+                </Wrapper>
+                <CartBtn onClick={() => setIsOpen(true)}>
+                  🛒 Carrinho
+                  {totalQuantity > 0 && <Badge>{totalQuantity}</Badge>}
+                </CartBtn>
+                <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
+                <Sidebar $open={isOpen}>
+                  <h2>Seu carrinho</h2>
+                  {isLoading && <p>Carregando carrinho...</p>}
+                  {!isLoading && items.length === 0 && (
+                    <p>Seu carrinho está vazio.</p>
+                  )}
+                  {items.map((item) => (
+                    <Card key={item.id}>
+                      <Content>
+                        <Img
+                          src={item.image}
+                          alt={item.name}
+                          style={{
+                            width: "100%",
+                            height: 100,
+                            objectFit: "cover",
+                            borderRadius: 8,
+                          }}
+                        />
+                        <h4>{item.name}</h4>
+                        <p>{formatCurrency(item.price)} cada</p>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            alignItems: "center",
+                          }}
+                        >
+                          <button
+                            onClick={() => decrement(item.id)}
+                            disabled={item.quantity === 1}
+                          >
+                            -
+                          </button>
+                          <strong>{item.quantity}</strong>
+                          <button onClick={() => increment(item.id)}>+</button>
+                          <button onClick={() => removeFromCart(item.id)}>
+                            Remover
+                          </button>
+                        </div>
+                        <small>
+                          Subtotal: {formatCurrency(item.quantity * item.price)}
+                        </small>
+                      </Content>
+                    </Card>
+                  ))}
+                  <hr />
+                  <p>
+                    Subtotal: <strong>{formatCurrency(subtotal)}</strong>
+                  </p>
+                  <p>
+                    Total: <strong>{formatCurrency(total)}</strong>
+                  </p>
+                  <div style={{ padding: "20px" }}>
+                    <Button
+                      as="a"
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Send Order
+                    </Button>
+                    <button
+                      onClick={clearCart}
+                      style={{
+                        marginLeft: "20px",
+                        padding: "10px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Limpar carrinho
+                    </button>
+                  </div>
+                </Sidebar>
+              </div>
+            </NavRow>
+          </Navbar>
+        </header>
         <Hero id="home">
           <Container>
             <h1
               style={{ fontSize: "clamp(2rem, 8vw, 4.5rem)", marginBottom: 6 }}
             >
-              Santinho & Cia
+              {logoName}
             </h1>
             <p style={{ maxWidth: 580, fontSize: "1.1rem", color: "#dbeafe" }}>
               Comida reconfortante preparada por chefs, entregue rapidamente ou
@@ -553,10 +626,24 @@ export const App = () => {
                     <h3>
                       {item.name}{" "}
                       <span style={{ color: "#fb923c" }}>
-                        R$: {item.price}.00
+                        {formatCurrency(item.price)}
                       </span>
                     </h3>
                     <p style={{ color: "#cbd5e1" }}>{item.description}</p>
+                    <button
+                      onClick={() => addToCart(item)}
+                      style={{
+                        marginTop: 10,
+                        border: "none",
+                        background: "#f97316",
+                        color: "#fff",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      + Add
+                    </button>
                   </div>
                   <div>
                     <img
@@ -633,7 +720,7 @@ export const App = () => {
                     borderRadius: "999px",
                   }}
                 />{" "}
-                <p>(21) 99675-4183</p>
+                <p>{contactNumber}</p>
               </a>
             </p>
             <iframe
@@ -654,7 +741,7 @@ export const App = () => {
         >
           <Container>
             <p>
-              © {new Date().getFullYear()} Santinho & Cia. Todos os Direitos
+              © {new Date().getFullYear()} {logoName}. Todos os Direitos
               Reservados.
             </p>
           </Container>
@@ -672,7 +759,7 @@ export const App = () => {
             boxShadow: "0 10px 24px rgba(0,0,0,.3)",
           }}
         >
-          Order Now
+          Pedir Agora
         </a>
       </Page>
     </>

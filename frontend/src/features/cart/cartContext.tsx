@@ -9,9 +9,9 @@ type CartContextValue = {
   subtotal: number;
   total: number;
   addToCart: (item: MenuItem) => void;
-  removeFromCart: (id: string) => void;
-  increment: (id: string) => void;
-  decrement: (id: string) => void;
+  removeFromCart: (id: number) => void;
+  increment: (id: number) => void;
+  decrement: (id: number) => void;
   clearCart: () => void;
   isLoading: boolean;
 };
