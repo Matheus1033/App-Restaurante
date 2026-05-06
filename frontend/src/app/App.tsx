@@ -275,7 +275,6 @@ export const App = () => {
                 gap: 14,
                 flexWrap: "wrap",
                 marginTop: 24,
-                transition: "ease-in-out",
               }}
             >
               <a
