@@ -339,8 +339,14 @@ const Sidebar = styled.aside<{ $open: boolean }>`
   background: rgba(2, 6, 23, 0.97);
   padding: 16px;
   transform: translateX(${({ $open }) => ($open ? "0" : "100%")});
-  transition: transform 0.25s ease;
-  overflow: auto;
+  transition: transform 0.3s ease;
+
+  overflow-y: auto;
+  z-index: 1000;
+
+  @media (max-width: 425px) {
+    width: 100%;
+  }
 `;
 
 export const App = () => {
@@ -363,8 +369,8 @@ export const App = () => {
       (item) =>
         `• ${item.name} x${item.quantity} = ${formatCurrency(item.quantity * item.price)}`,
     );
-    const text = `Olá! Quero fazer este pedido:%0A${lines.join("%0A")}%0A%0ATotal: ${formatCurrency(total)}`;
-    return `https://wa.me/?text=${text}`;
+    const text = `Olá! Quero fazer este pedido:\n${lines.join("\n")}\nTotal: ${formatCurrency(total)}`;
+    return `https://wa.me/5521996754183?text=${encodeURIComponent(text)}`;
   }, [items, total]);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isSolidNav, setSolidNav] = useState(false);
@@ -487,11 +493,38 @@ export const App = () => {
                       onClick={clearCart}
                       style={{
                         marginLeft: "20px",
-                        padding: "10px",
-                        fontWeight: 700,
+                        padding: "11px",
+                        fontSize: "0.9rem",
+                        fontWeight: "700",
+                        border: "none",
+                        borderRadius: "8px",
                       }}
                     >
                       Limpar carrinho
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "red",
+                        color: "#000",
+                        fontWeight: "700",
+                        fontSize: "1.5rem",
+                        fontFamily: "sans-serif",
+                        border: "none",
+                        borderRadius: 8,
+                      }}
+                    >
+                      X Fechar
                     </button>
                   </div>
                 </Sidebar>
@@ -707,7 +740,7 @@ export const App = () => {
             <p>Mon–Thu: 11:00 AM – 10:00 PM | Fri–Sun: 11:00 AM – 11:30 PM</p>
             <p>
               <a
-                href="https://wa.me/21996754183"
+                href="https://wa.me/5521996754183"
                 style={{ display: "flex", gap: "10px", fontSize: "1.05rem" }}
                 target="blank"
               >
